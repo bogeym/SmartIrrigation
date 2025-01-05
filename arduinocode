@@ -1,0 +1,226 @@
+#include <LiquidCrystal.h>
+#include "DHT.h"
+
+// Initialize the LCD library with the numbers of the interface pins
+LiquidCrystal lcd(2, 3, 4, 5, 6, 7);
+
+// Define pin connections
+const int relay_Pin = 8;
+const int DHT11_Sensor = 9;
+const int moisture_sensor = A0;
+const int rain_Sensor = 10;
+
+// Define the type of DHT sensor
+#define DHTTYPE DHT11
+
+// Declare variables to store sensor values
+int moisture_sensor_value;
+int rain_Sensor_value;
+float humidity_value, temperature_value;
+
+// Initialize the DHT sensor
+DHT dht(DHT11_Sensor, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600); // Start serial communication at 9600 baud
+  pinMode(relay_Pin, OUTPUT); // Set the relay pin as an output
+  pinMode(rain_Sensor, INPUT); // Set the rain sensor pin as an input
+  lcd.begin(16, 2); // Initialize the LCD with 16 columns and 2 rows
+  lcd.print("Smart Irrigation ");
+  lcd.setCursor(0, 1); // Set the cursor to the second row, first column
+  lcd.print("SYSTEM");
+  digitalWrite(relay_Pin, LOW); // Ensure the water pump is off at the start
+  dht.begin(); // Initialize the DHT sensor
+  delay(500);
+}
+
+void loop() {
+  readDHT11_Sensor(); // Read temperature and humidity from the DHT11 sensor
+  detect_moisture_level(); // Read soil moisture level
+  control_water_pump(); // Control the water pump based on sensor readings
+}
+
+void readDHT11_Sensor() {
+  humidity_value = dht.readHumidity(); // Read humidity
+  temperature_value = dht.readTemperature(); // Read temperature
+
+  // Check if any reads failed and exit early (to try again)
+  if (isnan(humidity_value) || isnan(temperature_value)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  // Print and display humidity
+  Serial.print("Humidity: ");
+  Serial.print(humidity_value);
+  Serial.println("%");
+  lcd.clear();
+  lcd.print("Humidity %: ");
+  lcd.setCursor(0, 1);
+  lcd.print(humidity_value);
+  delay(500);
+
+  // Print and display temperature
+  Serial.print("Temperature: ");
+  Serial.print(temperature_value);
+  Serial.println("C ");
+  lcd.clear();
+  lcd.print("Temperature: ");
+  lcd.setCursor(0, 1);
+  lcd.print(temperature_value);
+  delay(500);
+}
+
+void detect_moisture_level() {
+  moisture_sensor_value = analogRead(moisture_sensor); // Read soil moisture level
+  Serial.print("Moisture Level: ");
+  Serial.println(moisture_sensor_value);
+  lcd.clear();
+  lcd.print("Moisture Level: ");
+  lcd.setCursor(0, 1);
+  lcd.print(moisture_sensor_value);
+  delay(500);
+}
+
+void control_water_pump() {
+  rain_Sensor_value = digitalRead(rain_Sensor); // Read rain sensor status
+  delay(500);
+
+  if (rain_Sensor_value == LOW) { // No rain detected
+    if (moisture_sensor_value < 700) { // Moisture level below 700 indicates dry soil
+      digitalWrite(relay_Pin, HIGH); // Turn on water pump
+      lcd.clear();
+      lcd.print("Low water level");
+      lcd.setCursor(0, 1);
+      lcd.print("Motor ON");
+      delay(500);
+    } else { // Moisture level above 700 indicates wet soil
+      digitalWrite(relay_Pin, LOW); // Turn off water pump
+      lcd.clear();
+      lcd.print("Water Level Ok");
+      lcd.setCursor(0, 1);
+      lcd.print("Motor OFF");
+      delay(500);
+    }
+  } else { // Rain detected
+    digitalWrite(relay_Pin, LOW); // Turn off water pump
+    lcd.clear();
+    lcd.print("Rain Detected");
+    lcd.setCursor(0, 1);
+    lcd.print("Motor OFF");
+    delay(500);
+  }
+}
+#include <LiquidCrystal.h>
+#include "DHT.h"
+
+// Initialize the LCD library with the numbers of the interface pins
+LiquidCrystal lcd(2, 3, 4, 5, 6, 7);
+
+// Define pin connections
+const int relay_Pin = 8;
+const int DHT11_Sensor = 9;
+const int moisture_sensor = A0;
+const int rain_Sensor = 10;
+
+// Define the type of DHT sensor
+#define DHTTYPE DHT11
+
+// Declare variables to store sensor values
+int moisture_sensor_value;
+int rain_Sensor_value;
+float humidity_value, temperature_value;
+
+// Initialize the DHT sensor
+DHT dht(DHT11_Sensor, DHTTYPE);
+
+void setup() {
+  Serial.begin(9600); // Start serial communication at 9600 baud
+  pinMode(relay_Pin, OUTPUT); // Set the relay pin as an output
+  pinMode(rain_Sensor, INPUT); // Set the rain sensor pin as an input
+  lcd.begin(16, 2); // Initialize the LCD with 16 columns and 2 rows
+  lcd.print("Smart Irrigation ");
+  lcd.setCursor(0, 1); // Set the cursor to the second row, first column
+  lcd.print("SYSTEM");
+  digitalWrite(relay_Pin, LOW); // Ensure the water pump is off at the start
+  dht.begin(); // Initialize the DHT sensor
+  delay(500);
+}
+
+void loop() {
+  readDHT11_Sensor(); // Read temperature and humidity from the DHT11 sensor
+  detect_moisture_level(); // Read soil moisture level
+  control_water_pump(); // Control the water pump based on sensor readings
+}
+
+void readDHT11_Sensor() {
+  humidity_value = dht.readHumidity(); // Read humidity
+  temperature_value = dht.readTemperature(); // Read temperature
+
+  // Check if any reads failed and exit early (to try again)
+  if (isnan(humidity_value) || isnan(temperature_value)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+
+  // Print and display humidity
+  Serial.print("Humidity: ");
+  Serial.print(humidity_value);
+  Serial.println("%");
+  lcd.clear();
+  lcd.print("Humidity %: ");
+  lcd.setCursor(0, 1);
+  lcd.print(humidity_value);
+  delay(500);
+
+  // Print and display temperature
+  Serial.print("Temperature: ");
+  Serial.print(temperature_value);
+  Serial.println("C ");
+  lcd.clear();
+  lcd.print("Temperature: ");
+  lcd.setCursor(0, 1);
+  lcd.print(temperature_value);
+  delay(500);
+}
+
+void detect_moisture_level() {
+  moisture_sensor_value = analogRead(moisture_sensor); // Read soil moisture level
+  Serial.print("Moisture Level: ");
+  Serial.println(moisture_sensor_value);
+  lcd.clear();
+  lcd.print("Moisture Level: ");
+  lcd.setCursor(0, 1);
+  lcd.print(moisture_sensor_value);
+  delay(500);
+}
+
+void control_water_pump() {
+  rain_Sensor_value = digitalRead(rain_Sensor); // Read rain sensor status
+  delay(500);
+
+  if (rain_Sensor_value == LOW) { // No rain detected
+    if (moisture_sensor_value < 700) { // Moisture level below 700 indicates dry soil
+      digitalWrite(relay_Pin, HIGH); // Turn on water pump
+      lcd.clear();
+      lcd.print("Low water level");
+      lcd.setCursor(0, 1);
+      lcd.print("Motor ON");
+      delay(500);
+    } else { // Moisture level above 700 indicates wet soil
+      digitalWrite(relay_Pin, LOW); // Turn off water pump
+      lcd.clear();
+      lcd.print("Water Level Ok");
+      lcd.setCursor(0, 1);
+      lcd.print("Motor OFF");
+      delay(500);
+    }
+  } else { // Rain detected
+    digitalWrite(relay_Pin, LOW); // Turn off water pump
+    lcd.clear();
+    lcd.print("Rain Detected");
+    lcd.setCursor(0, 1);
+    lcd.print("Motor OFF");
+    delay(500);
+  }
+}
